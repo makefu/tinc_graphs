@@ -4,15 +4,9 @@ import sys,json,os
 from .Graph import delete_unused_nodes,resolve_myself
 GEODB=os.environ.get("GEODB","GeoLiteCity.dat")
 
-def copy_map():
-    from shutil import copy
+def get_static_dir():
     from os.path import dirname,join,realpath
-    if len(sys.argv) != 2 or sys.argv[1] == "--help" :
-        print("usage: {} <destination>".format(sys.argv[0]))
-        print("  copies the map.html file to the <destination>")
-        sys.exit(1)
-    dstdir=sys.argv[1]
-    copy(realpath(join(dirname(__file__),'static/map.html')),dstdir)
+    print(realpath(join(dirname(__file__),'static/')))
 
 
 def add_geo(nodes):

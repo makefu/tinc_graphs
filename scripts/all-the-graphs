@@ -7,10 +7,6 @@ export TINC_HOSTPATH=${TINC_HOSTPATH:-~/painload/retiolum/hosts}
 mapfile="$INTERNAL_FOLDER/map.html"
 
 if test -n "$GEODB";then
-    if test ! -e "$mapfile";then
-      echo "copying map to $map.html"
-      copy-map "$mapfile"
-    fi
     echo "creating geodata database"
     tinc-stats2json | add-geodata > "$INTERNAL_FOLDER/marker.json"
 fi

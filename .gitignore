@@ -2,4 +2,5 @@ bin/
 include/
 lib/
 *.egg-info/
+__pycache__/
 GeoLiteCity.dat

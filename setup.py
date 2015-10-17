@@ -22,7 +22,7 @@ setup(
         'console_scripts' : [
             'tinc-stats2json = tinc_graphs.Log2JSON:main',
             'tinc-build-graph = tinc_graphs.Graph:main',
-            'copy-map = tinc_graphs.Geo:copy_map',
+            'tincstats-static-dir = tinc_graphs.Geo:get_static_dir',
             'add-geodata = tinc_graphs.Geo:main',
             'tinc-availability-stats = tinc_graphs.Availability:generate_stats',
             ]
