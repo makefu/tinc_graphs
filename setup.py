@@ -1,23 +1,24 @@
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='tinc_graphs',
-    version='0.3.2',
+    version='0.3.6',
 
     description='Create Graphs from tinc Stats',
     long_description=open("README.md").read(),
     license='WTFPL',
     url='http://krebsco.de/',
     download_url='https://pypi.python.org/pypi/tinc_graphs/',
-
     author='krebs',
     author_email='spam@krebsco.de',
     # you will also need graphviz and imagemagick
     install_requires = [ 'pygeoip' ],
     scripts = ['scripts/all-the-graphs', 'scripts/build-graphs'],
     packages=['tinc_graphs'],
-    package_data = {'tinc_graphs' : ['static/*'] },
+    package_data = {'tinc_graphs': ['static/internal/*.html',
+                                    'static/internal/js/*.js',
+                                    'static/internal/css/*.css' ]},
     entry_points={
         'console_scripts' : [
             'tinc-stats2json = tinc_graphs.Log2JSON:main',
