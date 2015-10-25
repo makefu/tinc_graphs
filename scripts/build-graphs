@@ -23,5 +23,6 @@ do
   i=`expr $i + 1`
 done
 
+rm -f "$out/retiolum_1.$TYPE2"
 convert -limit memory 32Mib -limit map 64Mib "$out/retiolum_1.$TYPE"  "$out/retiolum_1.$TYPE2"
 rm "$DOTFILE"
