@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='tinc_graphs',
-    version='0.3.6',
+    version='0.3.9',
 
     description='Create Graphs from tinc Stats',
     long_description=open("README.md").read(),
@@ -16,9 +16,8 @@ setup(
     install_requires = [ 'pygeoip' ],
     scripts = ['scripts/all-the-graphs', 'scripts/build-graphs'],
     packages=['tinc_graphs'],
-    package_data = {'tinc_graphs': ['static/internal/*.html',
-                                    'static/internal/js/*.js',
-                                    'static/internal/css/*.css' ]},
+    package_data = {'tinc_graphs': ['static/*/*.html',
+                                    'static/*/css/*.css' ]},
     entry_points={
         'console_scripts' : [
             'tinc-stats2json = tinc_graphs.Log2JSON:main',
