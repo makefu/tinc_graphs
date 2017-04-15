@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='tinc_graphs',
-    version='0.3.9',
+    version='0.3.10',
 
     description='Create Graphs from tinc Stats',
     long_description=open("README.md").read(),

@@ -1,5 +1,9 @@
 # Generate Graphs from tinc
 
+## TODO
+
+* currently the Maps api key is hard coded in `tinc_graphs/static/map.html`, if you want to use this feature you will need to replace this key manually
+
 ## Install
 ### Nix
 

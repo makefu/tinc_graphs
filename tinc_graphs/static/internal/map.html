@@ -13,9 +13,9 @@
         height: 100%;
       }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&key=AIzaSyAn9ihuuhCRh4J9tPQebHyVohaqSg8sWUg"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-    <script type="text/javascript" src="jquery.ui.map.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-map/3.0-rc1/jquery.ui.map.js"></script>
     <script>
       var map;
       var markerlist ={};
@@ -40,7 +40,8 @@
         var mapOptions = {
           zoom: 5,
           center: new google.maps.LatLng(51,9),
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+
         };
         map = new google.maps.Map(document.getElementById('map-canvas'),
         mapOptions);
