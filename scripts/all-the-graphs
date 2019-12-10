@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 EXTERNAL_FOLDER=${EXTERNAL_FOLDER:-/var/www/euer.krebsco.de/graphs/retiolum}
 INTERNAL_FOLDER=${INTERNAL_FOLDER:-/var/www/euer/graphs/retiolum}
