@@ -40,3 +40,11 @@ see source of the 2 builder scripts:
 
 - http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
 - nix-env -iA geolite-legacy
+
+
+## Upload to pypi
+
+```bash
+python setup.py sdist
+twine upload dist/*
+```

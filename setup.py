@@ -7,6 +7,7 @@ setup(
 
     description='Create Graphs from tinc Stats',
     long_description=open("README.md").read(),
+    long_description_content_type='text/markdown',
     license='WTFPL',
     url='http://krebsco.de/',
     download_url='https://pypi.python.org/pypi/tinc_graphs/',
