@@ -1,89 +1,156 @@
-
-
 <!DOCTYPE html>
 <html>
   <head>
     <title>Simple Map</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8" />
     <style>
-      html, body, #map-canvas {
+      html,
+      body,
+      #map-canvas {
         margin: 0;
         padding: 0;
         height: 100%;
       }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&key=AIzaSyAn9ihuuhCRh4J9tPQebHyVohaqSg8sWUg"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-map/3.0-rc1/jquery.ui.map.js"></script>
-    <script>
-      var map;
-      var markerlist ={};
-      function addInfoWindow(marker, message) {
-        var info = message;
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
 
-        var infoWindow = new google.maps.InfoWindow({
-          content: message
-        });
-
-        google.maps.event.addListener(marker, 'click', function () {
-
-          // close all the infowindows
-          $.each(markerlist,function (k,v){
-            v["infowin"].close()
-          });
-          infoWindow.open(map, marker);
-        });
-        return infoWindow;
-      }
-      function initialize() {
-        var mapOptions = {
-          zoom: 5,
-          center: new google.maps.LatLng(51,9),
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
-
-        };
-        map = new google.maps.Map(document.getElementById('map-canvas'),
-        mapOptions);
-
-        $.getJSON("marker.json",function (data){
-          $.each(data,function (k,v) {
-
-            // add initial marker
-            var pt=new google.maps.LatLng(v["latitude"],v["longitude"])
-            var marker= new google.maps.Marker({
-              id: k,map:map,title: k,position:pt,content:k})
-
-            // add edges
-            $.each(v["to"],function(iter,val){
-              var line = [
-              pt,
-              new google.maps.LatLng(val['latitude'],val['longitude'])
-        ]
-              
-              var  connector = new google.maps.Polyline({
-                path:line,
-                strokeColor: "#FF0000",
-                strokeOpacity: 1.0,
-                strokeWeight: 2
-              })
-              connector.setMap(map);
-              val["line"]=connector
-
-            })
-
-          
-            marker["infowin"]=addInfoWindow(marker,k+'<br/>'+v["city"]);
-            markerlist[k] = marker;
-          }); 
-        })
-      }; 
-
-      google.maps.event.addDomListener(window, 'load', initialize);
-
-    </script>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.7.0/build/ol.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.7.0/css/ol.css"
+    />
   </head>
   <body>
-    <div id="map-canvas"></div>
+    <div id="map-canvas">
+      <div id="popup"></div>
+    </div>
+    <script>
+      window.onload = () => {
+        $.getJSON("marker.json", function (data) {
+          let features = [];
+
+          for (const [name, node] of Object.entries(data)) {
+            const nodeCoordinates = ol.proj.fromLonLat([
+              node["longitude"],
+              node["latitude"],
+            ]);
+            features.push(
+              new ol.Feature({
+                name,
+                external: `${node["external-ip"]}:${node["external-port"]}`,
+                internal: node["internal-ip"],
+                connections: node["to"].length,
+                location: [node["city"], node["country_name"]]
+                  .filter(Boolean)
+                  .join(", "),
+                geometry: new ol.geom.Point(nodeCoordinates),
+              })
+            );
+            for (const connectedNode of node.to) {
+              const connectedNodeCoordinates = ol.proj.fromLonLat([
+                connectedNode["longitude"],
+                connectedNode["latitude"],
+              ]);
+              features.push(
+                new ol.Feature({
+                  name: `${name} ⇄ ${connectedNode.name}`,
+                  weight: connectedNode.weight,
+                  geometry: new ol.geom.LineString([
+                    nodeCoordinates,
+                    connectedNodeCoordinates,
+                  ]),
+                })
+              );
+            }
+          }
+
+          const vectorLayer = new ol.layer.Vector({
+            style: (feature, resolution) =>
+              new ol.style.Style({
+                image: new ol.style.Icon({
+                  src: "http://krebsco.de/favicon.ico",
+                  scale: feature.get("connections")
+                    ? Math.log(feature.get("connections")) / 2
+                    : 1,
+                }),
+                stroke: new ol.style.Stroke({
+                  color: "#f77",
+                  width: feature.get("weight")
+                    ? Math.log(parseInt(feature.get("weight"))) / 2
+                    : 1,
+                }),
+              }),
+            source: new ol.source.Vector({
+              features,
+            }),
+            opacity: 0.75,
+          });
+
+          const map = new ol.Map({
+            layers: [
+              new ol.layer.Tile({ source: new ol.source.OSM() }),
+              vectorLayer,
+            ],
+            target: "map-canvas",
+            view: new ol.View({
+              center: ol.proj.fromLonLat([9, 51]),
+              zoom: 5,
+            }),
+          });
+
+          const element = document.getElementById("popup");
+
+          const popup = new ol.Overlay({
+            element,
+            positioning: "bottom-center",
+            stopEvent: false,
+          });
+          map.addOverlay(popup);
+          // display popup on click
+          map.on("click", function (evt) {
+            const feature = map.forEachFeatureAtPixel(evt.pixel, (a) => a);
+            if (feature) {
+              popup.setPosition(evt.coordinate);
+              $(element).popover({
+                placement: "top",
+                html: true,
+              });
+              $(element).attr(
+                "data-content",
+                `<strong>${feature.get("name")}</strong>` +
+                  (feature.get("location")
+                    ? ` ${feature.get("location")}`
+                    : "") +
+                  (feature.get("external")
+                    ? `<br/>external: ${feature.get("external")}`
+                    : "") +
+                  (feature.get("internal")
+                    ? `<br/>internal: ${feature.get("internal").join(" / ")}`
+                    : "") +
+                  (feature.get("connections")
+                    ? `<br/>connections: ${feature.get("connections")}`
+                    : "") +
+                  (feature.get("weight")
+                    ? `<br/>weight: ${feature.get("weight")}`
+                    : "")
+              );
+              $(element).popover("show");
+            } else {
+              $(element).popover("dispose");
+            }
+          });
+          // Close the popup when the map is moved
+          map.on("movestart", function () {
+            $(element).popover("dispose");
+          });
+        });
+      };
+    </script>
   </body>
 </html>
